@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  游戏项目资产与协作管理系统（GameAsset Hub）—— 后端工程
+
+  模块1：项目与成员管理模块
+  学号 85230645  姓名 张忠驰
+
+  编码说明：本机 Maven 平台编码为 GBK，源码与注释全部为中文，
+  因此必须显式声明 sourceEncoding / reporting.outputEncoding 为 UTF-8，
+  否则 javac 会按 GBK 读取 UTF-8 源码，报 unmappable character 或产出乱码。
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.5.16</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>com.zhangchi</groupId>
+  <artifactId>game-asset-hub</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+  <name>game-asset-hub</name>
+  <description>游戏项目资产与协作管理系统 - 模块1 项目与成员管理</description>
+
+  <properties>
+    <java.version>17</java.version>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <mybatis-plus.version>3.5.17</mybatis-plus.version>
+    <jjwt.version>0.12.6</jjwt.version>
+    <spring-security-crypto.version>6.5.11</spring-security-crypto.version>
+  </properties>
+
+  <dependencies>
+    <!-- ============ Web / 参数校验 ============ -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+
+    <!-- ============ AOP：@ProjectPermission 切面所需 ============ -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-aop</artifactId>
+    </dependency>
+
+    <!-- ============ Redis：项目概览缓存 + JWT 登出黑名单 ============ -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+
+    <!-- ============ 持久层 ============
+         必须是 spring-boot3 专用 starter：
+         mybatis-plus-boot-starter 是 Spring Boot 2 的，引入后会因
+         auto-configuration 注册方式不兼容导致应用起不来。 -->
+    <dependency>
+      <groupId>com.baomidou</groupId>
+      <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+      <version>${mybatis-plus.version}</version>
+    </dependency>
+
+    <!--
+      分页插件的载体。
+      MyBatis-Plus 3.5.9 起把依赖 JSqlParser 的拦截器（PaginationInnerInterceptor、
+      TenantLineInnerInterceptor 等）从 mybatis-plus-extension 拆到了这个独立包，
+      不引它 PaginationInnerInterceptor 根本不存在，编译期即报「找不到符号」。
+      版本必须与 starter 严格一致。
+    -->
+    <dependency>
+      <groupId>com.baomidou</groupId>
+      <artifactId>mybatis-plus-jsqlparser</artifactId>
+      <version>${mybatis-plus.version}</version>
+    </dependency>
+
+    <!-- MySQL 驱动版本由 Spring Boot 统一托管，不写版本号 -->
+    <dependency>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- ============ JWT 0.12.6（新 API：Jwts.parser().verifyWith(...)） ============ -->
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-api</artifactId>
+      <version>${jjwt.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-impl</artifactId>
+      <version>${jjwt.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-jackson</artifactId>
+      <version>${jjwt.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- ============ 密码加密 ============
+         只取 BCryptPasswordEncoder，绝不引 spring-boot-starter-security：
+         那会开启整套 Security 过滤链，与本项目的拦截器鉴权方案冲突。 -->
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-crypto</artifactId>
+      <version>${spring-security-crypto.version}</version>
+    </dependency>
+
+    <!-- ============ 工具 ============ -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <!--
+      Excel 导出（模块4 的 /stat/export）。
+      版本与项目02（教师教学助手）同版本 5.4.0，产物已经在本地 Maven 仓库
+      D:\java\.tools\m2 里，构建时不需要联网。
+      只引 poi-ooxml：poi 与 poi-ooxml-schemas 由它传递带上，
+      单独再写反而容易出现版本错配（NoSuchMethodError: XmlObject）。
+    -->
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi-ooxml</artifactId>
+      <version>5.4.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <!-- 本机 JDK 17 默认平台编码是 GBK，中文日志会在控制台显示成乱码。
+               不影响 HTTP 响应（Jackson 走 UTF-8），只影响可读性。 -->
+          <jvmArguments>-Dfile.encoding=UTF-8</jvmArguments>
+          <excludes>
+            <exclude>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+            </exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

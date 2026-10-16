@@ -1,0 +1,131 @@
+# ============================================================
+# 游戏项目资产与协作管理系统 —— 应用配置
+# 模块1：项目与成员管理
+# ============================================================
+server:
+  port: 8082
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  # 大资产上传（模块2 用），提前放开，避免后续接文件接口时踩坑
+  tomcat:
+    max-swallow-size: -1
+
+spring:
+  application:
+    name: game-asset-hub
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 与另外两个项目保持同一套环境变量约定：默认值可直接跑通本机开发环境，
+    # 部署时用 DB_HOST / DB_PORT / DB_NAME / DB_USERNAME / DB_PASSWORD 覆盖即可。
+    # 原先这里写死 password: root 是错的（本机 root 密码是 123456），
+    # 会导致启动看似正常、一访问数据库就 Access denied。
+    url: jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:game_asset_hub}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:123456}
+    hikari:
+      minimum-idle: 2
+      maximum-pool-size: 10
+      connection-timeout: 30000
+      pool-name: GameAssetHubHikariPool
+
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 0
+      timeout: 5000ms
+      # 刻意不配 lettuce.pool：连接池需要 commons-pool2 在 classpath 上，
+      # 而 spring-boot-starter-data-redis 并不带它。不配则 Lettuce 用共享原生连接，
+      # 对模块1 的缓存与令牌黑名单场景完全够用，也少一个启动期的隐性依赖。
+
+  jackson:
+    default-property-inclusion: always
+    time-zone: GMT+8
+
+  servlet:
+    multipart:
+      max-file-size: 2GB
+      max-request-size: 2GB
+
+mybatis-plus:
+  configuration:
+    # 下划线列名 → 驼峰属性，project_member.member_count → memberCount
+    map-underscore-to-camel-case: true
+    # 开发期打印 SQL，便于验证「单资源查询是否带了 project_id」这条硬约束
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    banner: false
+    db-config:
+      # 逻辑删除：只对声明了 deleted 字段的实体生效
+      # （project_member 没有该列，因此成员移除走 status = REMOVED 状态位）
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  mapper-locations: classpath*:/mapper/**/*.xml
+
+gameasset:
+  jwt:
+    # 必须是 >= 32 字节：HS256 要求，短于 32 字节 jjwt 0.12.x 直接抛 WeakKeyException。
+    # 生产环境请用环境变量注入，不要把这个默认值带上线。
+    secret: ${JWT_SECRET:game-asset-hub-zhangchi-85230645-jwt-secret-key-2026}
+    # 开发者使用时长较长，按文档取值 480 分钟（8 小时）
+    expire-minutes: 480
+
+  # ============================================================
+  # 模块2：资产文件存储（文档 3.3 第 5 点「存储抽象」）
+  #
+  # type 切换实现，业务代码不感知：
+  #   local —— LocalStorageService，落到 local-path，无需任何外部服务
+  #   minio —— MinioStorageService，本项目只保留实现位与配置位，
+  #            未引入 minio SDK，选中它调用上传会明确报 500
+  # ============================================================
+  storage:
+    type: local
+    local-path: ${STORAGE_PATH:D:/java/.tools/uploads/game-asset-hub}
+    minio:
+      endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+      access-key: ${MINIO_AK:}
+      secret-key: ${MINIO_SK:}
+      bucket: ${MINIO_BUCKET:game-assets}
+
+  # ============================================================
+  # 模块2：大文件分片上传（文档 7.6）
+  #
+  # 分片落 {temp-path}/{uploadId}/{index}.part，complete 时按序合并；
+  # cleanup-cron 到点清理超过 expire-hours 没动过的残留会话。
+  # ============================================================
+  chunk-upload:
+    temp-path: ${CHUNK_TEMP_PATH:D:/java/.tools/uploads/game-asset-hub/tmp/chunks}
+    chunk-size: 5242880               # 5MB，init 接口会下发给前端，两边不会脱节
+    expire-hours: 24
+    cleanup-cron: "0 0 3 * * ?"       # 每天凌晨 3 点
+
+  # ============================================================
+  # 模块2：资产版本上传的并发控制（文档 5.2）
+  #
+  # 同一资产并发上传时用分布式锁把「读最大版本号 → 写新版本」串行化，
+  # 避免两个请求都算出同一个版本号（唯一约束会拦下其中一个，但用户看到的是上传失败）。
+  # ============================================================
+  asset:
+    lock-wait-millis: 3000            # 抢锁最长等待，等太久不如让用户重试
+    lock-ttl-seconds: 120             # 锁持有上限，远大于单次上传耗时
+
+  # ============================================================
+  # 模块3：任务到期提醒（文档 5.8 的最后一行）
+  #
+  # 默认每天 9:05 扫一遍「明天到期且未完成」的任务提醒负责人。
+  # 同一个任务同一天只会推一条（幂等窗口按天），因此把 cron 调密
+  # 不会刷屏，只是让它更早被发现——演示时想立刻看到效果，
+  # 用环境变量覆盖成每分钟即可，不必改代码。
+  # ============================================================
+  task:
+    due-reminder-cron: ${TASK_DUE_REMINDER_CRON:0 5 9 * * ?}
+
+logging:
+  level:
+    root: info
+    com.zhangchi.gameasset: debug

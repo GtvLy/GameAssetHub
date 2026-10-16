@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GameAsset Hub · 游戏项目资产与协作管理</title>
+    <meta name="description" content="美术资产版本管理 · 任务看板 · 团队协作可视化" />
+    <script>
+      // 在框架加载前就把主题类挂到 <html> 上，避免首屏白闪（FOUC）：
+      // 等到 main.ts 执行再切换，用户会先看到一帧浅色背景再跳成深色。
+      (function () {
+        try {
+          var saved = localStorage.getItem('gah_theme')
+          var mode = saved === 'light' || saved === 'dark' ? saved : 'auto'
+          var prefersDark =
+            window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+          if (mode === 'dark' || (mode === 'auto' && prefersDark)) {
+            document.documentElement.classList.add('dark')
+          }
+        } catch (e) {
+          /* localStorage 被禁用时忽略，退回浅色 */
+        }
+      })()
+    </script>
+    <script type="module" crossorigin src="/assets/index-HRkmGZ0z.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-B0Z9INg1.js">
+    <link rel="modulepreload" crossorigin href="/assets/element-plus-HevpOkJP.js">
+    <link rel="modulepreload" crossorigin href="/assets/vue-BZ58XqWk.js">
+    <link rel="stylesheet" crossorigin href="/assets/element-plus-BaBc3jQa.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-3arG1D6e.css">
+  </head>
+  <body>
+    <div id="app"></div>
+  </body>
+</html>

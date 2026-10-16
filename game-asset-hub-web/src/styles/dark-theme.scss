@@ -1,0 +1,74 @@
+/**
+ * 深色 / 浅色主题变量
+ *
+ * 照文档 7.1 定义，并在其基础上补齐了「创作工具质感」需要的层级
+ * （面板 / 卡片 / 悬浮三档背景，强调色的柔和态与描边色）。
+ *
+ * 约定：
+ *   - 组件里一律用 var(--xxx)，不写死颜色，否则切主题时会漏掉几处；
+ *   - 深色不是简单反色：背景用带蓝调的近黑（#14161a）而非纯黑，
+ *     纯黑配白字在长时间使用下会产生光晕感，做资产整理这种长时任务尤其难受。
+ */
+
+:root {
+  --bg-base: #ffffff;
+  --bg-panel: #f5f7fa;
+  --bg-card: #ffffff;
+  --bg-hover: #eef1f6;
+  --text-primary: #1f2329;
+  --text-muted: #8a9099;
+  --border: #e4e7ed;
+  --accent: #5b8cff;
+  --accent-soft: rgba(91, 140, 255, 0.12);
+  --success: #34c77b;
+  --warning: #e6a23c;
+  --danger: #f56c6c;
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.06), 0 8px 24px rgba(16, 24, 40, 0.06);
+  --radius: 10px;
+}
+
+html.dark {
+  --bg-base: #14161a;
+  --bg-panel: #1a1d23;
+  --bg-card: #22262e;
+  --bg-hover: #2a2f39;
+  --text-primary: #e8eaed;
+  --text-muted: #8b929c;
+  --border: #2e333d;
+  --accent: #6f95ff;
+  --accent-soft: rgba(111, 149, 255, 0.16);
+  --success: #4ade80;
+  --warning: #f0b355;
+  --danger: #ff7875;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+/**
+ * Element Plus 深色适配
+ *
+ * Element Plus 自身有 dark/css-vars.css，但它的默认深色偏冷紫，
+ * 与这里定义的「创作工具」蓝调不一致，因此把关键变量覆盖成我们的值。
+ * 只覆盖用到的几类，避免把 EP 的内部变量全部接管后难以跟随版本升级。
+ */
+html.dark {
+  --el-bg-color: var(--bg-card);
+  --el-bg-color-page: var(--bg-base);
+  --el-bg-color-overlay: var(--bg-card);
+  --el-text-color-primary: var(--text-primary);
+  --el-text-color-regular: var(--text-primary);
+  --el-text-color-secondary: var(--text-muted);
+  --el-text-color-placeholder: var(--text-muted);
+  --el-border-color: var(--border);
+  --el-border-color-light: var(--border);
+  --el-border-color-lighter: var(--border);
+  --el-fill-color-blank: var(--bg-card);
+  --el-fill-color-light: var(--bg-hover);
+  --el-color-primary: var(--accent);
+
+  /* 表格：去掉斑马纹的强对比，改用极淡的行分隔，接近 IDE 的观感 */
+  --el-table-bg-color: var(--bg-card);
+  --el-table-tr-bg-color: var(--bg-card);
+  --el-table-header-bg-color: var(--bg-panel);
+  --el-table-border-color: var(--border);
+  --el-table-row-hover-bg-color: var(--bg-hover);
+}
