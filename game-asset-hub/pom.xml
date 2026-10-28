@@ -3,7 +3,7 @@
   游戏项目资产与协作管理系统（GameAsset Hub）—— 后端工程
 
   模块1：项目与成员管理模块
-  学号 85230645  姓名 张忠驰
+  学号   姓名 管理员
 
   编码说明：本机 Maven 平台编码为 GBK，源码与注释全部为中文，
   因此必须显式声明 sourceEncoding / reporting.outputEncoding 为 UTF-8，
@@ -22,7 +22,7 @@
     <relativePath/>
   </parent>
 
-  <groupId>com.zhangchi</groupId>
+  <groupId>com.demo</groupId>
   <artifactId>game-asset-hub</artifactId>
   <version>1.0.0</version>
   <packaging>jar</packaging>

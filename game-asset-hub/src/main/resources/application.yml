@@ -71,7 +71,7 @@ gameasset:
   jwt:
     # 必须是 >= 32 字节：HS256 要求，短于 32 字节 jjwt 0.12.x 直接抛 WeakKeyException。
     # 生产环境请用环境变量注入，不要把这个默认值带上线。
-    secret: ${JWT_SECRET:game-asset-hub-zhangchi-85230645-jwt-secret-key-2026}
+    secret: ${JWT_SECRET:game-asset-hub-demo-jwt-secret-key-2026}
     # 开发者使用时长较长，按文档取值 480 分钟（8 小时）
     expire-minutes: 480
 
@@ -128,4 +128,4 @@ gameasset:
 logging:
   level:
     root: info
-    com.zhangchi.gameasset: debug
+    com.demo.gameasset: debug

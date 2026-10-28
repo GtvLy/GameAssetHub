@@ -168,7 +168,7 @@ async function handleRegister() {
       <div class="login__demo">
         <div class="login__demo-title">演示账号（密码均为 123456）</div>
         <div class="login__demo-row">
-          <code>zhangchi</code><span>项目负责人（OWNER）</span>
+          <code>demo</code><span>项目负责人（OWNER）</span>
         </div>
         <div class="login__demo-row">
           <code>liyang</code><span>美术（ARTIST）</span>

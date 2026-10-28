@@ -415,7 +415,7 @@ foreach ($f in $frontends) {
 Write-Step '===== 访问地址与演示账号 =====' 'Green'
 
 $summary = @(
-    @{ Name = '游戏项目资产与协作管理系统'; Url = 'http://localhost:5175'; Accounts = 'zhangchi / 123456 (OWNER)　liyang / 123456 (ARTIST)' }
+    @{ Name = '游戏项目资产与协作管理系统'; Url = 'http://localhost:5175'; Accounts = 'demo / 123456 (OWNER)　liyang / 123456 (ARTIST)' }
 )
 
 foreach ($s in $summary) {

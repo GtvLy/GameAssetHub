@@ -5,7 +5,6 @@
 --  模块3：任务看板与协作
 --  模块4：统计与进度可视化
 --
---  学号：85230645    姓名：张忠驰
 --
 --  前置：先执行 schema.sql 建库建表
 --  用法：mysql -uroot -p < src/main/resources/db/data.sql
@@ -62,13 +61,13 @@ ALTER TABLE project_report AUTO_INCREMENT = 1;
 -- 密文由 BCryptPasswordEncoder().encode("123456") 真实生成（60 字符），
 -- 由单元测试 DemoAccountPasswordTest 读本文件校验，防止手改到登不进去。
 --
---   zhangchi  / 123456   项目负责人，项目内角色 OWNER
+--   demo  / 123456   项目负责人，项目内角色 OWNER
 --   liyang    / 123456   美术，项目内角色 ARTIST
 -- ------------------------------------------------------------
 INSERT INTO sys_user (id, username, password, nickname, email, role, status) VALUES
-(1, 'zhangchi',
+(1, 'demo',
  '$2a$10$oOD7sXPh2vQL74FUdgfQsOO.HhFZARjk8LdVVPPawvTj5ZjlKa2DK',
- '张忠驰', 'zhangchi@gameasset.dev', 'MEMBER', 1),
+ '管理员', 'demo@gameasset.dev', 'MEMBER', 1),
 (2, 'liyang',
  '$2a$10$xLXa2ADtW3R56KWiMZy6puLeRFlyJSPimBXAo7cWGArpi.cBy1yWO',
  '李阳', 'liyang@gameasset.dev', 'MEMBER', 1);
@@ -78,7 +77,7 @@ INSERT INTO sys_user (id, username, password, nickname, email, role, status) VAL
 --
 -- 场景取自真实的 UE5 独立游戏开发流程：一个主线项目 + 一个已暂停的试验项目，
 -- 便于验证「我的项目列表」「项目切换器」「状态标签」在不同状态下的表现。
--- owner_id = 1（张忠驰），两个项目都是他创建的。
+-- owner_id = 1（管理员），两个项目都是他创建的。
 -- ------------------------------------------------------------
 INSERT INTO project (id, name, code, description, engine, owner_id,
                      start_date, plan_end_date, status, member_count) VALUES
@@ -92,8 +91,8 @@ INSERT INTO project (id, name, code, description, engine, owner_id,
 -- ------------------------------------------------------------
 -- 演示成员关系
 --
---   项目1 星港计划：张忠驰 OWNER（已加入）+ 李阳 ARTIST（已加入）
---   项目2 像素农场：张忠驰 OWNER（已加入），单人项目
+--   项目1 星港计划：管理员 OWNER（已加入）+ 李阳 ARTIST（已加入）
+--   项目2 像素农场：管理员 OWNER（已加入），单人项目
 --
 -- 另外插入一条 INVITED 记录演示邀请流程：把「王工」邀请进星港计划当程序员，
 -- 邀请码固定为 DEMO2026INVITECODE00000000000000，可直接用于端到端验证：
@@ -305,7 +304,7 @@ INSERT INTO asset_status_log (asset_id, from_status, to_status, operator_id, rem
 --  场景承接「星港计划」：四列都有任务，覆盖
 --    · 三个逾期任务（截止日期早于今天）与一个临近截止的任务
 --    · 关联资产的任务（卡片上显示资产分类标签与状态）
---    · 不同负责人（张忠驰 / 李阳）与不同类型的任务
+--    · 不同负责人（管理员 / 李阳）与不同类型的任务
 --    · 评论含 @提及，通知含未读与已读
 --  看一眼看板就能判断「逾期标红、四列分布、故事点合计」是否正常。
 -- ============================================================
@@ -443,7 +442,7 @@ INSERT INTO task_status_log (task_id, project_id, from_status, to_status, operat
 --
 -- 演示两种视角：
 --   李阳（2）3 条未读 —— 演示铃铛角标与「可筛未读」
---   张忠驰（1）1 条未读 —— 演示「项目负责人收到提交审核提醒」
+--   管理员（1）1 条未读 —— 演示「项目负责人收到提交审核提醒」
 --
 -- 所有通知都不自己发给自己（文档 5.8 的硬规则）：sender_id 与 user_id 必然不同。
 -- ------------------------------------------------------------
@@ -451,7 +450,7 @@ INSERT INTO notification (id, project_id, user_id, type, title, content, biz_typ
 (1001, 1, 2, 'TASK_ASSIGNED', '有新任务指派给你：推进器音效重新混音',
  '优先级 P0，截止 2026-09-20', 'TASK', 502, 1, 0, '2026-09-16 14:00:00'),
 (1002, 1, 2, 'MENTION', '你在任务里被提及：空间站地板模块接缝对齐',
- '张忠驰：@李阳 接缝这里和墙面模块对不齐，麻烦按 3m 网格重新对齐一下。', 'TASK', 504, 1, 0,
+ '管理员：@李阳 接缝这里和墙面模块对不齐，麻烦按 3m 网格重新对齐一下。', 'TASK', 504, 1, 0,
  '2026-09-22 15:40:00'),
 (1003, 1, 2, 'ASSET_REVIEW', '资产被打回：推进器点火音效',
  '尾段 1.2s 处有明显爆音，循环点也不平滑，请重新混音后再提交', 'ASSET', 5, 1, 0,

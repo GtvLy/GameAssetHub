@@ -68,7 +68,7 @@
 ```
 GameAssetHub/
 ├── game-asset-hub/          # 后端（Spring Boot）
-│   ├── src/main/java/com/zhangchi/gameasset/   # 后端源码
+│   ├── src/main/java/com/demo/gameasset/   # 后端源码
 │   └── src/main/resources/db/                  # schema.sql + data.sql
 ├── game-asset-hub-web/      # 前端（Vue 3 + Vite）
 │   └── src/                 # 前端源码
@@ -98,7 +98,7 @@ powershell -ExecutionPolicy Bypass -File start-all.ps1
 
 | 用户名 | 密码 | 项目角色 |
 | --- | --- | --- |
-| `zhangchi` | `123456` | OWNER（星港计划、像素农场） |
+| `demo` | `123456` | OWNER（星港计划、像素农场） |
 | `liyang` | `123456` | ARTIST（星港计划） |
 | `wangong` | `123456` | PROGRAMMER（初始 INVITED） |
 | `chenjing` | `123456` | VIEWER（星港计划） |

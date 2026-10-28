@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "description": "游戏项目资产与协作管理系统 - 前端（模块1：项目与成员管理）",
-  "author": "张忠驰",
+  "author": "管理员",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
